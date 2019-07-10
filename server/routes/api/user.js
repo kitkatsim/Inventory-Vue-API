@@ -54,7 +54,7 @@ router.post('/login', async (req, res) => {
 });
 ***/
 
-// find a user
+// find a user, return the user data
 router.post('/finduser', async (req, res) => {
   const posts = await loadPostsCollection();
   res.send(await posts.findOne({ username: req.body.username }, { password: 1, salt: 1 }));
