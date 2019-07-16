@@ -54,10 +54,34 @@ router.post('/login', async (req, res) => {
 });
 ***/
 
+// get category of a user
+router.get('/getcategory/:id', async (req, res) => {
+    const posts = await loadPostsCollection();
+    // projection only works written this way
+    res.send(await posts.findOne({ _id: new mongodb.ObjectID(req.params.id) }, { projection: { category: 1, _id: 0 } }));
+})
+
+// add category to a user
+router.put('/category/:id', async (req, res) => {
+    const posts = await loadPostsCollection();
+    await posts.updateOne(
+        {
+            _id: new mongodb.ObjectID(req.params.id)
+        },
+        {
+            $push: {
+                category: req.body.category
+            }
+        }
+    );
+
+    res.status(200).send();
+});
+
 // find a user, return the user data
 router.post('/finduser', async (req, res) => {
-  const posts = await loadPostsCollection();
-  res.send(await posts.findOne({ username: req.body.username }, { password: 1, salt: 1 }));
+    const posts = await loadPostsCollection();
+    res.send(await posts.findOne({ username: req.body.username }, { password: 1, salt: 1 }).toArray());
 });
 
 
@@ -94,10 +118,10 @@ router.put('/:id', async (req, res) => {
  * @function
  * @param {number} length - Length of the random string.
  */
-var genRandomString = function(length){
-  return crypto.randomBytes(Math.ceil(length/2))
-          .toString('hex') /** convert to hexadecimal format */
-          .slice(0,length);   /** return required number of characters */
+var genRandomString = function (length) {
+    return crypto.randomBytes(Math.ceil(length / 2))
+        .toString('hex') /** convert to hexadecimal format */
+        .slice(0, length);   /** return required number of characters */
 };
 
 /**
@@ -106,14 +130,14 @@ var genRandomString = function(length){
 * @param {string} password - List of required fields.
 * @param {string} salt - Data to be validated.
 */
-var sha512 = function(password, salt){
-  var hash = crypto.createHmac('sha512', salt); /** Hashing algorithm sha512 */
-  hash.update(password);
-  var value = hash.digest('hex');
-  return {
-      salt:salt,
-      passwordHash:value
-  };
+var sha512 = function (password, salt) {
+    var hash = crypto.createHmac('sha512', salt); /** Hashing algorithm sha512 */
+    hash.update(password);
+    var value = hash.digest('hex');
+    return {
+        salt: salt,
+        passwordHash: value
+    };
 };
 
 
