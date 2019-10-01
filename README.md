@@ -1,5 +1,6 @@
 # Inventory-Vue
 A basic inventory management app.
+This repo contains the API.
 
 Part of the process of learning VueJS. 
 
